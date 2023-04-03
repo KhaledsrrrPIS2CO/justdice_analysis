@@ -1,4 +1,5 @@
 import csv
+import re
 
 
 def check_data_types(file_path):
@@ -23,13 +24,16 @@ def check_data_types(file_path):
 
         # Initialize dictionary to store counts of data types for each header
         for header in headers:
-            data_types_count[header] = {'int': 0, 'float': 0, 'string': 0, 'empty': 0}
+            data_types_count[header] = {'int': 0, 'float': 0, 'string': 0, 'empty': 0, 'scientific': 0}
 
-        # Iterate through each row in the file and count the data types for each value in the row
+            # Iterate through each row in the file and count the data types for each value in the row
         for row in reader:
             for column_index, cell_value in enumerate(row):
                 if cell_value == '':
                     data_type = 'empty'
+                    # Check if the cell_value is a float value or contains scientific notation
+                    if re.search(r'[eE][+-]?\d+', cell_value):
+                        data_type = 'scientific'
                 else:
                     try:
                         int(cell_value)
@@ -38,6 +42,9 @@ def check_data_types(file_path):
                         try:
                             float(cell_value)
                             data_type = 'float'
+                            # Check if the cell_value contains scientific notation
+                            if re.search(r'[eE][+-]?\d+', cell_value):
+                                data_type = 'scientific'
                         except ValueError:
                             data_type = 'string'
 
@@ -55,6 +62,7 @@ if __name__ == '__main__':
 
 
     # Call the function with the file paths and print the resulting dictionary
+    print("Adspend:: ")
     data_types_count_adspend = check_data_types(adspend_path)
     for column, count in data_types_count_adspend.items():
         print(f"{column}, {count}")
