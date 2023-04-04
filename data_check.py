@@ -1,5 +1,43 @@
 import csv
 import re
+import pandas as pd
+import time
+
+
+def convert_scientific_notation(file_path):
+    # Load CSV into pandas dataframe
+    df = pd.read_csv(file_path)
+
+    # Identify columns with scientific notation
+    scientific_cols = df.select_dtypes(include=['float', 'int']).columns
+
+    # Define the new file path
+    new_file_path = file_path[:-4] + '_converted.csv'
+
+    # Replace scientific notation with decimal representation
+    for col in scientific_cols:
+        if col == "value_usd":
+            df[col] = df[col].apply(lambda x: '{:.10f}'.format(x))
+            # Write dataframe to new CSV file
+            df.to_csv(new_file_path, index=False)
+        else:
+            print("Not value_usd column")
+
+    print("Conversion completed.\n")
+
+    return new_file_path
+
+print("Adspend: ")
+adspend_path = convert_scientific_notation('/Users/khaled/Downloads/data/adspend.csv')
+print("Installs:")
+installs_path = convert_scientific_notation('/Users/khaled/Downloads/data/installs.csv')
+print("Payouts:")
+payouts_path = convert_scientific_notation('/Users/khaled/Downloads/data/payouts.csv')
+print("Revenue:")
+revenue_path = convert_scientific_notation('/Users/khaled/Downloads/data/revenue.csv')
+
+print("Files are being exported...\n")
+time.sleep(10)  # wait for 10 seconds for csv files to be exported
 
 
 def check_data_types(file_path):
@@ -55,10 +93,10 @@ def check_data_types(file_path):
 
 
 if __name__ == '__main__':
-    adspend_path = f"/Users/khaled/Downloads/data/adspend.csv"
+    adspend_path = f"/Users/khaled/Downloads/data/adspend_converted.csv"
     installs_path = f"/Users/khaled/Downloads/data/installs.csv"
-    payouts_path = f"/Users/khaled/Downloads/data/payouts.csv"
-    revenue_path = f"/Users/khaled/Downloads/data/revenue.csv"
+    payouts_path = f"/Users/khaled/Downloads/data/payouts_converted.csv"
+    revenue_path = f"/Users/khaled/Downloads/data/revenue_converted.csv"
 
 
     # Call the function with the file paths and print the resulting dictionary
@@ -81,3 +119,6 @@ if __name__ == '__main__':
     data_types_count_revenue = check_data_types(revenue_path)
     for column, count in data_types_count_revenue.items():
         print(f"{column}, {count}")
+
+
+print("Done, files are ready for analysis.")
