@@ -28,13 +28,13 @@ def convert_scientific_notation(file_path):
     return new_file_path
 
 print("Adspend: ")
-adspend_path = convert_scientific_notation('/Users/khaled/Downloads/data/adspend.csv')
+convert_scientific_notation('/Users/khaled/Downloads/data/adspend.csv')
 print("Installs:")
-installs_path = convert_scientific_notation('/Users/khaled/Downloads/data/installs.csv')
+convert_scientific_notation('/Users/khaled/Downloads/data/installs.csv')
 print("Payouts:")
-payouts_path = convert_scientific_notation('/Users/khaled/Downloads/data/payouts.csv')
+convert_scientific_notation('/Users/khaled/Downloads/data/payouts.csv')
 print("Revenue:")
-revenue_path = convert_scientific_notation('/Users/khaled/Downloads/data/revenue.csv')
+convert_scientific_notation('/Users/khaled/Downloads/data/revenue.csv')
 
 print("Files are being exported...\n")
 time.sleep(10)  # wait for 10 seconds for csv files to be exported
@@ -120,5 +120,54 @@ if __name__ == '__main__':
     for column, count in data_types_count_revenue.items():
         print(f"{column}, {count}")
 
+print("\n-----------------\n")
 
-print("Done, files are ready for analysis.")
+
+def explore_csv(file_path):
+    """
+    Description:
+    The "explore_csv" function takes a file path as an argument and performs some basic exploratory analysis on the
+    data in the CSV file
+    :param file_path:
+    """
+    # Load the CSV file into a Pandas DataFrame
+    df = pd.read_csv(file_path)
+
+    # Print the first and last few rows of the data
+    print("First few rows:")
+    print(df.head())
+    print("\nLast few rows:")
+    print(df.tail())
+
+    # Get information on the data types and number of non-null values in each column
+    print("\nData types and non-null values:")
+    print(df.info())
+
+    # Get summary statistics for each numeric column in the dataset
+    print("\nSummary statistics:")
+    print(df.describe())
+
+    # Get the number of rows and columns in the dataset
+    print("\nShape of the dataset:")
+    print(df.shape)
+
+    # Get a list of all the column names in the dataset
+    print("\nColumn names:")
+    print(df.columns)
+
+    # Get the number of missing values in each column
+    print("\nNumber of missing values:")
+    print(df.isnull().sum())
+
+
+print("\n#Explore Adspend: ")
+explore_csv('/Users/khaled/Downloads/data/adspend.csv')
+print("\n#Explore Installs:")
+explore_csv('/Users/khaled/Downloads/data/installs.csv')
+print("\n#Explore Payouts:")
+explore_csv('/Users/khaled/Downloads/data/payouts.csv')
+print("\n#Explore Revenue:")
+explore_csv('/Users/khaled/Downloads/data/revenue.csv')
+
+
+print("\n---------\nDone, files are ready for analysis.")
