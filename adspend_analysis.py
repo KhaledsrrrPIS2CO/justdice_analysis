@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from scipy.stats import pareto
 
 adspend_path = '/Users/khaled/Downloads/data/adspend_converted.csv'
 
@@ -71,22 +72,6 @@ def analyze_adspend(file_path):
     plt.ylabel('Ad Spend (USD)')
     plt.show()
 
-    # Analyze ad spend by ad network
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x=adspend_by_network.index, y=adspend_by_network.values)
-    plt.title('Ad Spend by Ad Network')
-    plt.xlabel('Network ID')
-    plt.ylabel('Ad Spend (USD)')
-    plt.show()
-
-    # Ad Spend Time Series Plot
-    plt.figure(figsize=(12, 6))
-    plt.plot(adspend_by_date.index, adspend_by_date.values)
-    plt.title('Ad Spend Time Series Plot')
-    plt.xlabel('Date')
-    plt.ylabel('Ad Spend (USD)')
-    plt.show()
-
     # Create a time series plot
     plt.figure(figsize=(12, 6))
     adspend_by_date.plot(kind="line")
@@ -135,9 +120,24 @@ def analyze_adspend(file_path):
     plt.xlabel("Ad Spend (USD)")
     plt.show()
 
+    # Fit Pareto distribution
+    data = adspend_by_date.values
+    b, loc, scale = pareto.fit(data)
 
+    # Create histogram
+    plt.figure(figsize=(12, 6))
+    n, bins, patches = plt.hist(data, bins=50, density=True, alpha=0.6, color='b', label='Ad Spend Histogram')
 
+    # Plot the fitted Pareto distribution
+    x = np.linspace(min(data), max(data), 100)
+    y = pareto.pdf(x, b, loc=loc, scale=scale)
+    plt.plot(x, y, label='Fitted Pareto', linestyle='--', color='r')
 
+    plt.title("Ad Spend Distribution")
+    plt.xlabel("Ad Spend (USD)")
+    plt.ylabel("Density")
+    plt.legend()
+    plt.show()
 
 
 # Call the function with the file path as an argument
