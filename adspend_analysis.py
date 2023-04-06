@@ -45,17 +45,27 @@ def analyze_adspend(file_path):
 
     # Perform exploratory data analysis
     # Analyze ad spend by country
-    country_adspend = adspend.groupby('country_id')['value_usd'].sum().sort_values(ascending=False)
+    adspend_by_country = adspend.groupby('country_id')['value_usd'].sum().sort_values(ascending=False)
     # Analyze ad spend by ad network
-    network_adspend = adspend.groupby('network_id')['value_usd'].sum().sort_values(ascending=False)
+    adspend_by_network = adspend.groupby('network_id')['value_usd'].sum().sort_values(ascending=False)
     # Analyze ad spend by client
-    client_adspend = adspend.groupby('client_id')['value_usd'].sum().sort_values(ascending=False)
+    adspend_by_client = adspend.groupby('client_id')['value_usd'].sum().sort_values(ascending=False)
     # Analyze ad spend over time
-    date_adspend = adspend.groupby('event_date')['value_usd'].sum()
+    adspend_by_date = adspend.groupby('event_date')['value_usd'].sum()
+
+    print("adspendTYPE:",type(adspend))
+    print()
+    print("adspend_by_date TYPE:", type(adspend_by_date), "Content: ", adspend_by_date)
+    print()
+    print("adspend_by_clientTYPE:",type(adspend_by_client), "Content: ", adspend_by_client)
+    print()
+    print("adspend_by_networkTYPE:",type(adspend_by_network), "Content: ", adspend_by_network)
+    print()
+    print("adspend_by_countryTYPE:",type(adspend_by_country), "Content: ", adspend_by_country)
 
     # Visualize Ad Spend by Country
     plt.figure(figsize=(12, 6))
-    sns.barplot(x=country_adspend.index, y=country_adspend.values)
+    sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values)
     plt.title('Ad Spend by Country')
     plt.xlabel('Country ID')
     plt.ylabel('Ad Spend (USD)')
@@ -63,7 +73,7 @@ def analyze_adspend(file_path):
 
     # Analyze ad spend by ad network
     plt.figure(figsize=(12, 6))
-    sns.barplot(x=network_adspend.index, y=network_adspend.values)
+    sns.barplot(x=adspend_by_network.index, y=adspend_by_network.values)
     plt.title('Ad Spend by Ad Network')
     plt.xlabel('Network ID')
     plt.ylabel('Ad Spend (USD)')
@@ -71,15 +81,23 @@ def analyze_adspend(file_path):
 
     # Ad Spend Time Series Plot
     plt.figure(figsize=(12, 6))
-    plt.plot(date_adspend.index, date_adspend.values)
+    plt.plot(adspend_by_date.index, adspend_by_date.values)
     plt.title('Ad Spend Time Series Plot')
     plt.xlabel('Date')
     plt.ylabel('Ad Spend (USD)')
     plt.show()
 
+    # Create a time series plot
+    plt.figure(figsize=(12, 6))
+    adspend_by_date.plot(kind="line")
+    plt.title("Ad Spend Distribution Over Time")
+    plt.xlabel("Date")
+    plt.ylabel("Ad Spend (USD)")
+    plt.show()
+
     # Visualize the ad spend by client
     plt.figure(figsize=(12, 6))
-    sns.barplot(x=client_adspend.index, y=client_adspend.values)
+    sns.barplot(x=adspend_by_client.index, y=adspend_by_client.values)
     plt.title('Ad Spend by Client')
     plt.xlabel('Client ID')
     plt.ylabel('Ad Spend (USD)')
@@ -88,14 +106,14 @@ def analyze_adspend(file_path):
 
     # Create a histogram and KDE plot
     plt.figure(figsize=(12, 6))
-    sns.histplot(client_adspend, kde=True, bins=10)
+    sns.histplot(adspend_by_client, kde=True, bins=10)
     plt.title("Ad Spend Distribution by Client")
     plt.xlabel("Ad Spend (USD)")
     plt.ylabel("Frequency")
     plt.show()
 
     # Apply log transformation
-    log_adspend_by_client = np.log1p(client_adspend)
+    log_adspend_by_client = np.log1p(adspend_by_client)
     # Create a histogram and KDE plot
     plt.figure(figsize=(12, 6))
     sns.histplot(log_adspend_by_client, kde=True, bins=10)
@@ -105,25 +123,21 @@ def analyze_adspend(file_path):
     plt.show()
     # Box plot
     plt.figure(figsize=(12, 6))
-    sns.boxplot(x=client_adspend)
+    sns.boxplot(x=adspend_by_client)
     plt.title("Ad Spend Distribution by Client - Box Plot")
     plt.xlabel("Ad Spend (USD)")
     plt.show()
 
     # Violin plot
     plt.figure(figsize=(12, 6))
-    sns.violinplot(x=client_adspend)
+    sns.violinplot(x=adspend_by_client)
     plt.title("Ad Spend Distribution by Client - Violin Plot")
     plt.xlabel("Ad Spend (USD)")
     plt.show()
 
-    # Create a time series plot
-    plt.figure(figsize=(12, 6))
-    date_adspend.plot(kind="line")
-    plt.title("Ad Spend Distribution Over Time")
-    plt.xlabel("Date")
-    plt.ylabel("Ad Spend (USD)")
-    plt.show()
+
+
+
 
 
 # Call the function with the file path as an argument
