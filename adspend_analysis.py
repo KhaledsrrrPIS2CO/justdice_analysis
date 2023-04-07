@@ -4,8 +4,8 @@ import seaborn as sns
 import numpy as np
 from scipy.stats import pareto
 
-adspend_path = '/Users/khaled/Downloads/data/adspend_converted.csv'
 
+adspend_path = '/Users/khaled/Downloads/data/adspend_converted.csv'
 
 def get_temporal_scope(csv_file):
     """
@@ -54,17 +54,18 @@ def analyze_adspend(file_path):
     # Analyze ad spend over time
     adspend_by_date = adspend.groupby('event_date')['value_usd'].sum()
 
-    print("adspendTYPE:",type(adspend))
-    print()
-    print("adspend_by_date TYPE:", type(adspend_by_date), "Content: ", adspend_by_date)
-    print()
-    print("adspend_by_clientTYPE:",type(adspend_by_client), "Content: ", adspend_by_client)
-    print()
-    print("adspend_by_networkTYPE:",type(adspend_by_network), "Content: ", adspend_by_network)
-    print()
-    print("adspend_by_countryTYPE:",type(adspend_by_country), "Content: ", adspend_by_country)
+    print("______________________")
+    print("adspend type:", type(adspend), "\nContent preview:\n", adspend)
+    print("______________________")
+    print("adspend_by_date type:", type(adspend_by_date), "\nContent preview:\n", adspend_by_date)
+    print("______________________")
+    print("adspend_by_client type:", type(adspend_by_client), "\nContent preview:\n", adspend_by_client)
+    print("______________________")
+    print("adspend_by_network type:", type(adspend_by_network), "\nContent preview:\n", adspend_by_network)
+    print("______________________")
+    print("adspend_by_country type:", type(adspend_by_country), "\nContent preview:\n", adspend_by_country)
 
-    # Visualize Ad Spend by Country
+    # Bar chart for Ad Spend by Country
     plt.figure(figsize=(12, 6))
     sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values)
     plt.title('Ad Spend by Country')
@@ -72,7 +73,7 @@ def analyze_adspend(file_path):
     plt.ylabel('Ad Spend (USD)')
     plt.show()
 
-    # Create a time series plot
+    # Time series plot for Ad Spend over time
     plt.figure(figsize=(12, 6))
     adspend_by_date.plot(kind="line")
     plt.title("Ad Spend Distribution Over Time")
@@ -80,7 +81,15 @@ def analyze_adspend(file_path):
     plt.ylabel("Ad Spend (USD)")
     plt.show()
 
-    # Visualize the ad spend by client
+    # Bar chart for Ad Spend by Ad Network
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x=adspend_by_network.index, y=adspend_by_network.values)
+    plt.title('Ad Spend by Ad Network')
+    plt.xlabel('Network ID')
+    plt.ylabel('Ad Spend (USD)')
+    plt.show()
+
+    # Bar chart of the ad spend by client
     plt.figure(figsize=(12, 6))
     sns.barplot(x=adspend_by_client.index, y=adspend_by_client.values)
     plt.title('Ad Spend by Client')
@@ -89,53 +98,27 @@ def analyze_adspend(file_path):
     plt.xticks(rotation=45)  # Optional: Rotate the x-axis labels for better readability
     plt.show()
 
-    # Create a histogram and KDE plot
+    # Histogram and power law plot of ad spend by client
     plt.figure(figsize=(12, 6))
-    sns.histplot(adspend_by_client, kde=True, bins=10)
+    sns.histplot(adspend_by_client, kde=True, bins=500)
     plt.title("Ad Spend Distribution by Client")
     plt.xlabel("Ad Spend (USD)")
     plt.ylabel("Frequency")
     plt.show()
 
-    # Apply log transformation
-    log_adspend_by_client = np.log1p(adspend_by_client)
-    # Create a histogram and KDE plot
-    plt.figure(figsize=(12, 6))
-    sns.histplot(log_adspend_by_client, kde=True, bins=10)
-    plt.title("Log-transformed Ad Spend Distribution by Client")
-    plt.xlabel("Log Ad Spend (USD)")
-    plt.ylabel("Frequency")
-    plt.show()
-    # Box plot
-    plt.figure(figsize=(12, 6))
-    sns.boxplot(x=adspend_by_client)
-    plt.title("Ad Spend Distribution by Client - Box Plot")
-    plt.xlabel("Ad Spend (USD)")
-    plt.show()
-
-    # Violin plot
-    plt.figure(figsize=(12, 6))
-    sns.violinplot(x=adspend_by_client)
-    plt.title("Ad Spend Distribution by Client - Violin Plot")
-    plt.xlabel("Ad Spend (USD)")
-    plt.show()
-
-    # Fit Pareto distribution
-    data = adspend_by_date.values
+    # Fit Pareto distribution of Ad Spend  by client
+    data = adspend_by_client.values
     b, loc, scale = pareto.fit(data)
-
     # Create histogram
     plt.figure(figsize=(12, 6))
-    n, bins, patches = plt.hist(data, bins=50, density=True, alpha=0.6, color='b', label='Ad Spend Histogram')
-
+    n, bins, patches = plt.hist(data, bins=200, density=True, alpha=0.6, color='b', label='Ad Spend Histogram')
     # Plot the fitted Pareto distribution
     x = np.linspace(min(data), max(data), 100)
     y = pareto.pdf(x, b, loc=loc, scale=scale)
     plt.plot(x, y, label='Fitted Pareto', linestyle='--', color='r')
-
-    plt.title("Ad Spend Distribution")
+    plt.title("Ad Spend Distribution by Client")
     plt.xlabel("Ad Spend (USD)")
-    plt.ylabel("Density")
+    plt.ylabel("Frequency")
     plt.legend()
     plt.show()
 
