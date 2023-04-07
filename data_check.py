@@ -17,7 +17,7 @@ def convert_scientific_notation(file_path):
     # Replace scientific notation with decimal representation
     for col in scientific_cols:
         if col == "value_usd":
-            df[col] = df[col].apply(lambda x: '{:.10f}'.format(x))
+            df[col] = df[col].apply(lambda x: '{:.6f}'.format(x))
             # Write dataframe to new CSV file
             df.to_csv(new_file_path, index=False)
         else:
@@ -160,14 +160,18 @@ def explore_csv(file_path):
     print(df.isnull().sum())
 
 
-print("\n#Explore Adspend: ")
+print("______________________")
+print("Explore Adspend:")
 explore_csv('/Users/khaled/Downloads/data/adspend.csv')
-print("\n#Explore Installs:")
+print("______________________")
+print("Explore Installs:")
 explore_csv('/Users/khaled/Downloads/data/installs.csv')
-print("\n#Explore Payouts:")
+print("______________________")
+print("Explore Payouts:")
 explore_csv('/Users/khaled/Downloads/data/payouts.csv')
-print("\n#Explore Revenue:")
+print("______________________")
+print("Explore Revenue:")
 explore_csv('/Users/khaled/Downloads/data/revenue.csv')
+print("______________________")
 
-
-print("\n---------\nDone, files are ready for analysis.")
+print("Done, files are ready for analysis.")

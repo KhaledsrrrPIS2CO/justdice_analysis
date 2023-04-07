@@ -71,6 +71,8 @@ def analyze_adspend(file_path):
     plt.title('Ad Spend by Country')
     plt.xlabel('Country ID')
     plt.ylabel('Ad Spend (USD)')
+    plt.tight_layout()
+    plt.savefig('Country: Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     # Time series plot for Ad Spend over time
@@ -79,6 +81,8 @@ def analyze_adspend(file_path):
     plt.title("Ad Spend Distribution Over Time")
     plt.xlabel("Date")
     plt.ylabel("Ad Spend (USD)")
+    plt.tight_layout()
+    plt.savefig('Time: Time series plot for Ad Spend over time.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     # Bar chart for Ad Spend by Ad Network
@@ -87,6 +91,8 @@ def analyze_adspend(file_path):
     plt.title('Ad Spend by Ad Network')
     plt.xlabel('Network ID')
     plt.ylabel('Ad Spend (USD)')
+    plt.tight_layout()
+    plt.savefig('Network: Bar chart for Ad Spend by Ad Network.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     # Bar chart of the ad spend by client
@@ -96,6 +102,8 @@ def analyze_adspend(file_path):
     plt.xlabel('Client ID')
     plt.ylabel('Ad Spend (USD)')
     plt.xticks(rotation=45)  # Optional: Rotate the x-axis labels for better readability
+    plt.tight_layout()
+    plt.savefig('Client: Bar chart of the ad spend by client.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     # Histogram and power law plot of ad spend by client
@@ -104,6 +112,8 @@ def analyze_adspend(file_path):
     plt.title("Ad Spend Distribution by Client")
     plt.xlabel("Ad Spend (USD)")
     plt.ylabel("Frequency")
+    plt.tight_layout()
+    plt.savefig('Client: Histogram and power law plot of ad spend by client.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     # Fit Pareto distribution of Ad Spend  by client
@@ -118,8 +128,10 @@ def analyze_adspend(file_path):
     plt.plot(x, y, label='Fitted Pareto', linestyle='--', color='r')
     plt.title("Ad Spend Distribution by Client")
     plt.xlabel("Ad Spend (USD)")
-    plt.ylabel("Frequency")
+    plt.ylabel("Probability Distribution Function")
     plt.legend()
+    plt.tight_layout()
+    plt.savefig('Client: Pareto distribution of Ad Spend  by client.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 
