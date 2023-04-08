@@ -5,15 +5,14 @@ import seaborn as sns
 import numpy as np
 from scipy.stats import pareto
 
-
 adspend_path = '/Users/khaled/Downloads/data/adspend_converted.csv'
 
-def get_temporal_scope(csv_file):
+
+def get_adspend_temporal_scope(csv_file):
     """
     Returns:
-        A dictionary with keys 'filename', 'first_date', 'last_date', and 'temporal_scope' representing the filename,
-        first and last dates in the CSV file, and the number of days between them (inclusive). to better understand the
-        data
+        dict: A dictionary containing information about the temporal scope of the adspend data.
+
     """
     df = pd.read_csv(csv_file)
     date_col = [col for col in df.columns if 'date' in col.lower()][0]
@@ -23,7 +22,7 @@ def get_temporal_scope(csv_file):
     return {'filename': csv_file, 'first_date': first_date, 'last_date': last_date, 'temporal_scope': temporal_scope}
 
 
-temporal_scope_results = get_temporal_scope(adspend_path)
+temporal_scope_results = get_adspend_temporal_scope(adspend_path)
 
 print(f"File Path: {temporal_scope_results['filename']}")
 print(f"First Date: {temporal_scope_results['first_date']}")
