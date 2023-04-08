@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import seaborn as sns
 import numpy as np
 from scipy.stats import pareto
@@ -54,26 +55,42 @@ def analyze_adspend(file_path):
     # Analyze ad spend over time
     adspend_by_date = adspend.groupby('event_date')['value_usd'].sum()
 
+    # Preview Pandas Series
     print("______________________")
-    print("adspend type:", type(adspend), "\nContent preview:\n", adspend)
+    print("adspend type:", type(adspend), "\nContent preview:\n", adspend,
+          "\nTotal ad spend (USD):", adspend['value_usd'].sum())
     print("______________________")
     print("adspend_by_date type:", type(adspend_by_date), "\nContent preview:\n", adspend_by_date)
     print("______________________")
-    print("adspend_by_client type:", type(adspend_by_client), "\nContent preview:\n", adspend_by_client)
+    print("adspend_by_client type:", type(adspend_by_client), "\nContent preview:\n", adspend_by_client,
+          "\nShape:\n", adspend_by_client.shape)
     print("______________________")
     print("adspend_by_network type:", type(adspend_by_network), "\nContent preview:\n", adspend_by_network)
     print("______________________")
     print("adspend_by_country type:", type(adspend_by_country), "\nContent preview:\n", adspend_by_country)
 
-    # Bar chart for Ad Spend by Country
-    plt.figure(figsize=(12, 6))
+    # Log-scale vertical bar chart for Ad Spend by Country
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values, log=True)
+    plt.title('Log-Scale Ad Spend by Country')
+    plt.xlabel('Country ID')
+    plt.ylabel('Ad Spend (USD)')
+    plt.yscale('log')
+    # Set y-axis ticks to normal USD values
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, pos: '${:,.0f}'.format(y)))
+    plt.tight_layout()
+    plt.savefig('Country: Log-Scale Vertical Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
+    plt.show()
+
+    # Normal scale vertical bar chart for Ad Spend by Country
+    plt.figure(figsize=(8, 6))
     sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values)
     plt.title('Ad Spend by Country')
     plt.xlabel('Country ID')
-    plt.ylabel('Ad Spend (USD)')
     plt.tight_layout()
-    plt.savefig('Country: Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.savefig('Country: Normal-Scale Vertical Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
+    plt.ylabel('Ad Spend (USD)')
 
     # Time series plot for Ad Spend over time
     plt.figure(figsize=(12, 6))
@@ -106,32 +123,45 @@ def analyze_adspend(file_path):
     plt.savefig('Client: Bar chart of the ad spend by client.png', dpi=300, bbox_inches='tight')
     plt.show()
 
-    # Histogram and power law plot of ad spend by client
+    # Create a histogram of ad spend by client
     plt.figure(figsize=(12, 6))
-    sns.histplot(adspend_by_client, kde=True, bins=500)
-    plt.title("Ad Spend Distribution by Client")
+    n, bins, patches = plt.hist(adspend_by_client, bins=50, alpha=0.6, color='b', label='Ad Spend Histogram by Client')
+    plt.title("Ad Spend Histogram by Client")
     plt.xlabel("Ad Spend (USD)")
     plt.ylabel("Frequency")
     plt.tight_layout()
-    plt.savefig('Client: Histogram and power law plot of ad spend by client.png', dpi=300, bbox_inches='tight')
-    plt.show()
-
-    # Fit Pareto distribution of Ad Spend  by client
+    # Set x-axis ticks to increments of 10,000
+    plt.xticks(np.arange(0, adspend_by_client.max() + 10000, 10000), rotation=45)
+    # Fit a Pareto distribution to the ad spend data
     data = adspend_by_client.values
     b, loc, scale = pareto.fit(data)
-    # Create histogram
-    plt.figure(figsize=(12, 6))
-    n, bins, patches = plt.hist(data, bins=200, density=True, alpha=0.6, color='b', label='Ad Spend Histogram')
     # Plot the fitted Pareto distribution
     x = np.linspace(min(data), max(data), 100)
-    y = pareto.pdf(x, b, loc=loc, scale=scale)
+    y = pareto.pdf(x, b, loc=loc, scale=scale) * n.sum() * (bins[1] - bins[0])
     plt.plot(x, y, label='Fitted Pareto', linestyle='--', color='r')
-    plt.title("Ad Spend Distribution by Client")
-    plt.xlabel("Ad Spend (USD)")
-    plt.ylabel("Probability Distribution Function")
+    plt.legend()
+    plt.savefig('Client: Ad Spend Histogram and Power Law Distribution.png', dpi=300, bbox_inches='tight')
+    plt.show()
+
+    # Calculate the percentage of ad spend for each client
+    adspend_percentage = adspend_by_client / adspend_by_client.sum() * 100
+    print("%%", adspend_percentage)
+    # Fit Pareto distribution
+    b, loc, scale = pareto.fit(adspend_percentage.values)
+    # Create histogram
+    plt.figure(figsize=(12, 6))
+    n, bins, patches = plt.hist(adspend_percentage.values, bins=100, density=False, alpha=0.6, color='b',
+                                label='Ad Spend Percentage Histogram')
+    # Plot the fitted Pareto distribution
+    x = np.linspace(min(adspend_percentage.values), max(adspend_percentage.values), 100)
+    y = pareto.pdf(x, b, loc=loc, scale=scale) * n.sum() * (bins[1] - bins[0])
+    plt.plot(x, y, label='Fitted Pareto', linestyle='--', color='r')
+    plt.title("Concentration of Ad Spend Among Clients: A Pareto Distribution")
+    plt.xlabel("Ad Spend Percentage (%)")
+    plt.ylabel("Frequency")
     plt.legend()
     plt.tight_layout()
-    plt.savefig('Client: Pareto distribution of Ad Spend  by client.png', dpi=300, bbox_inches='tight')
+    plt.savefig('Client: Pareto distribution of Ad Spend Percentage by Client.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 

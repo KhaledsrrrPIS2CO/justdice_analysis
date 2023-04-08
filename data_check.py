@@ -27,6 +27,7 @@ def convert_scientific_notation(file_path):
 
     return new_file_path
 
+
 print("Adspend: ")
 convert_scientific_notation('/Users/khaled/Downloads/data/adspend.csv')
 print("Installs:")
@@ -98,7 +99,6 @@ if __name__ == '__main__':
     payouts_path = f"/Users/khaled/Downloads/data/payouts_converted.csv"
     revenue_path = f"/Users/khaled/Downloads/data/revenue_converted.csv"
 
-
     # Call the function with the file paths and print the resulting dictionary
     print("Adspend:: ")
     data_types_count_adspend = check_data_types(adspend_path)
@@ -162,16 +162,16 @@ def explore_csv(file_path):
 
 print("______________________")
 print("Explore Adspend:")
-explore_csv('/Users/khaled/Downloads/data/adspend.csv')
+explore_csv('/Users/khaled/Downloads/data/adspend_converted.csv')
 print("______________________")
 print("Explore Installs:")
 explore_csv('/Users/khaled/Downloads/data/installs.csv')
 print("______________________")
 print("Explore Payouts:")
-explore_csv('/Users/khaled/Downloads/data/payouts.csv')
+explore_csv('/Users/khaled/Downloads/data/payouts_converted.csv')
 print("______________________")
 print("Explore Revenue:")
-explore_csv('/Users/khaled/Downloads/data/revenue.csv')
+explore_csv('/Users/khaled/Downloads/data/revenue_converted.csv')
 print("______________________")
 
 print("Done, files are ready for analysis.")
