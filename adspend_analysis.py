@@ -130,7 +130,6 @@ def analyze_adspend(file_path):
     plt.xlabel("Ad Spend (USD)")
     plt.ylabel("Frequency")
     plt.tight_layout()
-    # Set x-axis ticks to increments of 10,000
     plt.xticks(np.arange(0, adspend_by_client.max() + 10000, 10000), rotation=45)
     # Fit a Pareto distribution to the ad spend data
     data = adspend_by_client.values
