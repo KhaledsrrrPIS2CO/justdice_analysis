@@ -126,20 +126,20 @@ def analyze_revenue(file_path):
     ax.bar(deciles, decile_percentages)
     ax.set_xlabel('Deciles')
     ax.set_ylabel('Percentage of Total Revenue')
-    ax.set_title('Revenue Contribution by Decile as percentage')
+    ax.set_title('Install_id Revenue Contribution by Decile as percentage')
     for i, v in enumerate(decile_percentages):
         ax.text(i - 0.25, v + 0.25, f"{v:.2f}%", fontsize=9)
-    plt.savefig('Revenue Contribution by Decile as percentage.png', dpi=300, bbox_inches='tight')
+    plt.savefig('Install_id Revenue Contribution by Decile as percentage.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(deciles, decile_revenues)
     ax.set_xlabel('Deciles')
     ax.set_ylabel('Revenue (USD)')
-    ax.set_title('Revenue Contribution by Decile in USD')
+    ax.set_title('Install_id Revenue Contribution by Decile in USD')
     for i, v in enumerate(decile_revenues):
         ax.text(i - 0.25, v + 1000, f"${v:,.2f}", fontsize=9)
-    plt.savefig('Revenue Contribution by Decile in USD.png', dpi=300, bbox_inches='tight')
+    plt.savefig('Install_id Revenue Contribution by Decile in USD.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     # Pareto Distribution of Total Revenue by install_id

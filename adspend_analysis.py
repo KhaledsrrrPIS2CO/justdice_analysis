@@ -91,9 +91,13 @@ def analyze_adspend(file_path):
     plt.savefig('Country: Normal-Scale Vertical Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
     plt.ylabel('Ad Spend (USD)')
 
+    # Calculate 30-day rolling adspend
+    rolling_adspend = adspend_by_date.rolling(window=30).mean()
+
     # Time series plot for Ad Spend over time
     plt.figure(figsize=(12, 6))
     adspend_by_date.plot(kind="line")
+    rolling_adspend.plot(kind="line", color="red", label="30-day Moving Average")
     plt.title("Ad Spend Distribution Over Time")
     plt.xlabel("Date")
     plt.ylabel("Ad Spend (USD)")
@@ -122,7 +126,7 @@ def analyze_adspend(file_path):
     plt.savefig('Client: Bar chart of the ad spend by client.png', dpi=300, bbox_inches='tight')
     plt.show()
 
-    # Create a histogram of ad spend by client
+    # Histogram of ad spend by client
     plt.figure(figsize=(12, 6))
     n, bins, patches = plt.hist(adspend_by_client, bins=50, alpha=0.6, color='b', label='Ad Spend Histogram by Client')
     plt.title("Ad Spend Histogram by Client")
