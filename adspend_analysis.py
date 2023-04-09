@@ -129,6 +129,7 @@ def analyze_adspend(file_path):
     plt.xlabel("Ad Spend (USD)")
     plt.ylabel("Frequency")
     plt.tight_layout()
+    plt.ylim((0, 50))  # set the y-axis limits to (0, 50)
     plt.xticks(np.arange(0, adspend_by_client.max() + 10000, 10000), rotation=45)
     # Fit a Pareto distribution to the ad spend data
     data = adspend_by_client.values
@@ -141,9 +142,10 @@ def analyze_adspend(file_path):
     plt.savefig('Client: Ad Spend Histogram and Power Law Distribution.png', dpi=300, bbox_inches='tight')
     plt.show()
 
-    # Calculate the percentage of ad spend for each client
+    # Calculate the percentage of ad spend for each client & print client_id with % of adspend total
     adspend_percentage = adspend_by_client / adspend_by_client.sum() * 100
-    print("%%", adspend_percentage)
+    print("The percentage of ad spend for each client: ", adspend_percentage)
+
     # Fit Pareto distribution
     b, loc, scale = pareto.fit(adspend_percentage.values)
     # Create histogram
