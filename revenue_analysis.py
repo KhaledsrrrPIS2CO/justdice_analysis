@@ -171,7 +171,7 @@ def analyze_revenue(file_path):
         top_10_percent_decile_revenues.append(decile_revenue)
 
     # Calculate the percentage for each decile
-    top_10_percent_decile_percentages = [(decile_revenue / top_10_percent_revenue) * 100 for decile_revenue in
+    top_10_percent_decile_percentages = [(decile_revenue / total_revenue) * 100 for decile_revenue in
                                          top_10_percent_decile_revenues]
 
     # Plot the revenue contribution by decile for the top 10% install_ids as percentages of the total revenue
