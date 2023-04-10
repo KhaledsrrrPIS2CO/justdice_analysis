@@ -5,56 +5,26 @@ import seaborn as sns
 import numpy as np
 from scipy.stats import pareto
 
-adspend_path = '/Users/khaled/Downloads/data/adspend_converted.csv'
 
+def read_and_preprocess_data(file_path):
+    # Read and preprocess data
 
-def get_adspend_temporal_scope(csv_file):
-    """
-    Returns:
-        dict: A dictionary containing information about the temporal scope of the adspend data.
-
-    """
-    df = pd.read_csv(csv_file)
-    date_col = [col for col in df.columns if 'date' in col.lower()][0]
-    first_date = pd.to_datetime(df[date_col]).min()
-    last_date = pd.to_datetime(df[date_col]).max()
-    temporal_scope = (last_date - first_date).days + 1
-    return {'filename': csv_file, 'first_date': first_date, 'last_date': last_date, 'temporal_scope': temporal_scope}
-
-
-temporal_scope_results = get_adspend_temporal_scope(adspend_path)
-
-print(f"File Path: {temporal_scope_results['filename']}")
-print(f"First Date: {temporal_scope_results['first_date']}")
-print(f"Last Date: {temporal_scope_results['last_date']}")
-print(f"Temporal Scope: {temporal_scope_results['temporal_scope']} days")
-
-
-def analyze_adspend(file_path):
-    """
-    This function reads a CSV file containing ad spend data, performs exploratory data analysis,
-    and creates visualizations to display ad spend by country, ad network, client, and over time.
-
-    Args:
-        file_path (str): The file path of the adspend.csv file.
-    """
-    # Read the CSV file
     adspend = pd.read_csv(file_path)
-
-    # Clean the data
     adspend['event_date'] = pd.to_datetime(adspend['event_date'])
+    return adspend
 
-    # Perform exploratory data analysis
-    # Analyze ad spend by country
+
+def analyze_adspend_data(adspend):
+    # Perform exploratory data analysis:
     adspend_by_country = adspend.groupby('country_id')['value_usd'].sum().sort_values(ascending=False)
-    # Analyze ad spend by ad network
     adspend_by_network = adspend.groupby('network_id')['value_usd'].sum().sort_values(ascending=False)
-    # Analyze ad spend by client
     adspend_by_client = adspend.groupby('client_id')['value_usd'].sum().sort_values(ascending=False)
-    # Analyze ad spend over time
     adspend_by_date = adspend.groupby('event_date')['value_usd'].sum()
+    return adspend_by_country, adspend_by_network, adspend_by_client, adspend_by_date
 
-    # Preview Pandas Series
+
+def print_preview_data(adspend, adspend_by_country, adspend_by_network, adspend_by_client, adspend_by_date):
+    # Print preview data
     print("______________________")
     print("adspend type:", type(adspend), "\nContent preview:\n", adspend,
           "\nTotal ad spend (USD):", adspend['value_usd'].sum())
@@ -68,9 +38,8 @@ def analyze_adspend(file_path):
     print("______________________")
     print("adspend_by_country type:", type(adspend_by_country), "\nContent preview:\n", adspend_by_country)
 
-    total_adspend = adspend_by_country.sum()
-    percentage_adspend_by_country = (adspend_by_country / total_adspend) * 100
 
+def plot_adspend_by_country_log(adspend_by_country, total_adspend):
     # Log-scale vertical bar chart for Ad Spend by Country
     plt.figure(figsize=(8, 6))
     barplot = sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values, log=True)
@@ -81,6 +50,8 @@ def analyze_adspend(file_path):
     # Set y-axis ticks to USD values
     ax = plt.gca()
     ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, pos: '${:,.0f}'.format(y)))
+    # Calculate the percentage of total ad spend for each country
+    percentage_adspend_by_country = (adspend_by_country / total_adspend) * 100
     # Add percentages on top of each bar
     for p, perc in zip(barplot.patches, percentage_adspend_by_country.values):
         barplot.annotate('{:.1f}%'.format(perc),
@@ -94,6 +65,8 @@ def analyze_adspend(file_path):
                 bbox_inches='tight')
     plt.show()
 
+
+def plot_adspend_by_country(adspend_by_country, total_adspend):
     # Normal scale vertical bar chart for Ad Spend by Country
     plt.figure(figsize=(8, 6))
     ax = sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values)
@@ -105,6 +78,9 @@ def analyze_adspend(file_path):
     plt.ylabel('Ad Spend (USD)')
     plt.savefig('Country: Normal-Scale Vertical Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
     plt.show()
+
+
+def plot_adspend_over_time(adspend_by_date):
     # Calculate 30-day rolling adspend
     rolling_adspend = adspend_by_date.rolling(window=30).mean()
     # Time series plot for Ad Spend over time
@@ -118,6 +94,8 @@ def analyze_adspend(file_path):
     plt.savefig('Time: Time series plot for Ad Spend over time.png', dpi=300, bbox_inches='tight')
     plt.show()
 
+
+def plot_adspend_by_network(adspend_by_network, total_adspend):
     # Bar chart for Ad Spend by Ad Network
     plt.figure(figsize=(12, 6))
     barplot = sns.barplot(x=adspend_by_network.index, y=adspend_by_network.values)
@@ -137,6 +115,8 @@ def analyze_adspend(file_path):
     plt.savefig('Network: Bar chart for Ad Spend by Ad Network.png', dpi=300, bbox_inches='tight')
     plt.show()
 
+
+def plot_adspend_by_client(adspend_by_client, total_adspend):
     # Bar chart of the ad spend by client
     plt.figure(figsize=(12, 6))
     barplot = sns.barplot(x=adspend_by_client.index, y=adspend_by_client.values)
@@ -158,6 +138,8 @@ def analyze_adspend(file_path):
     plt.savefig('Client: Bar chart of the ad spend by client.png', dpi=300, bbox_inches='tight')
     plt.show()
 
+
+def plot_pareto_distribution(adspend_by_client):
     # Histogram of ad spend by client
     plt.figure(figsize=(12, 6))
     n, bins, patches = plt.hist(adspend_by_client, bins=50, alpha=0.6, color='b', label='Ad Spend Histogram by Client')
@@ -178,6 +160,8 @@ def analyze_adspend(file_path):
     plt.savefig('Client: Ad Spend Histogram and Power Law Distribution.png', dpi=300, bbox_inches='tight')
     plt.show()
 
+
+def plot_adspend_percentage_pareto(adspend_by_client):
     # Calculate the percentage of ad spend for each client & print client_id with % of adspend total
     adspend_percentage = adspend_by_client / adspend_by_client.sum() * 100
     print("The percentage of ad spend for each client: ", adspend_percentage)
@@ -201,7 +185,20 @@ def analyze_adspend(file_path):
     plt.show()
 
 
-# Call the function with the file path as an argument
-analyze_adspend(adspend_path)
+def analyze_adspend(file_path):
+    adspend = read_and_preprocess_data(file_path)
+    adspend_by_country, adspend_by_network, adspend_by_client, adspend_by_date = analyze_adspend_data(adspend)
+    print_preview_data(adspend, adspend_by_country, adspend_by_network, adspend_by_client, adspend_by_date)
+    total_adspend = adspend_by_country.sum()
+    plot_adspend_by_country(adspend_by_country, total_adspend)
+    plot_adspend_over_time(adspend_by_date)
+    plot_adspend_by_network(adspend_by_network, total_adspend)
+    plot_adspend_by_client(adspend_by_client, total_adspend)
+    plot_pareto_distribution(adspend_by_client)
+    plot_adspend_by_country_log(adspend_by_country, total_adspend)
+    plot_adspend_percentage_pareto(adspend_by_client)
 
-exit()
+
+# Call the analyze_adspend function with the file_path
+adspend_path = '/Users/khaled/Downloads/data/adspend_converted.csv'
+analyze_adspend(adspend_path)
