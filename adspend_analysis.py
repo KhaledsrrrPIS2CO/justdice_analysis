@@ -68,32 +68,45 @@ def analyze_adspend(file_path):
     print("______________________")
     print("adspend_by_country type:", type(adspend_by_country), "\nContent preview:\n", adspend_by_country)
 
+    total_adspend = adspend_by_country.sum()
+    percentage_adspend_by_country = (adspend_by_country / total_adspend) * 100
+
     # Log-scale vertical bar chart for Ad Spend by Country
     plt.figure(figsize=(8, 6))
-    sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values, log=True)
+    barplot = sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values, log=True)
     plt.title('Log-Scale Ad Spend by Country')
     plt.xlabel('Country ID')
     plt.ylabel('Ad Spend (USD)')
     plt.yscale('log')
-    # Set y-axis ticks to normal USD values
+    # Set y-axis ticks to USD values
     ax = plt.gca()
     ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, pos: '${:,.0f}'.format(y)))
+    # Add percentages on top of each bar
+    for p, perc in zip(barplot.patches, percentage_adspend_by_country.values):
+        barplot.annotate('{:.1f}%'.format(perc),
+                         (p.get_x() + p.get_width() / 2., p.get_height()),
+                         ha='center', va='baseline',
+                         fontsize=10, color='black',
+                         xytext=(0, 5),
+                         textcoords='offset points')
     plt.tight_layout()
-    plt.savefig('Country: Log-Scale Vertical Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
+    plt.savefig('Country: Log-Scale Vertical Bar chart for Ad Spend by Country (USD).png', dpi=300,
+                bbox_inches='tight')
     plt.show()
 
     # Normal scale vertical bar chart for Ad Spend by Country
     plt.figure(figsize=(8, 6))
-    sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values)
+    ax = sns.barplot(x=adspend_by_country.index, y=adspend_by_country.values)
+    # Add dollar values on top of each bar
+    for i, v in enumerate(adspend_by_country.values):
+        ax.text(i, v + 100, '${:,.0f}'.format(v), ha='center', fontsize=10)
     plt.title('Ad Spend by Country')
     plt.xlabel('Country ID')
-    plt.tight_layout()
-    plt.savefig('Country: Normal-Scale Vertical Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
     plt.ylabel('Ad Spend (USD)')
-
+    plt.savefig('Country: Normal-Scale Vertical Bar chart for Ad Spend by Country.png', dpi=300, bbox_inches='tight')
+    plt.show()
     # Calculate 30-day rolling adspend
     rolling_adspend = adspend_by_date.rolling(window=30).mean()
-
     # Time series plot for Ad Spend over time
     plt.figure(figsize=(12, 6))
     adspend_by_date.plot(kind="line")
@@ -107,21 +120,40 @@ def analyze_adspend(file_path):
 
     # Bar chart for Ad Spend by Ad Network
     plt.figure(figsize=(12, 6))
-    sns.barplot(x=adspend_by_network.index, y=adspend_by_network.values)
+    barplot = sns.barplot(x=adspend_by_network.index, y=adspend_by_network.values)
     plt.title('Ad Spend by Ad Network')
     plt.xlabel('Network ID')
     plt.ylabel('Ad Spend (USD)')
+    # Add percentages on top of each bar
+    for p in barplot.patches:
+        percentage = 100 * p.get_height() / total_adspend
+        barplot.annotate('{:.1f}%'.format(percentage),
+                         (p.get_x() + p.get_width() / 2., p.get_height()),
+                         ha='center', va='baseline',
+                         fontsize=10, color='black',
+                         xytext=(0, 5),
+                         textcoords='offset points')
     plt.tight_layout()
     plt.savefig('Network: Bar chart for Ad Spend by Ad Network.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     # Bar chart of the ad spend by client
     plt.figure(figsize=(12, 6))
-    sns.barplot(x=adspend_by_client.index, y=adspend_by_client.values)
+    barplot = sns.barplot(x=adspend_by_client.index, y=adspend_by_client.values)
     plt.title('Ad Spend by Client')
     plt.xlabel('Client ID')
     plt.ylabel('Ad Spend (USD)')
     plt.xticks(rotation=45)  # Optional: Rotate the x-axis labels for better readability
+    # Add the percentage of total ad spend on top of each bar
+    for p in barplot.patches:
+        height = p.get_height()
+        percentage = (height / total_adspend) * 100
+        barplot.annotate('{:.1f}%'.format(percentage),
+                         (p.get_x() + p.get_width() / 2., height),
+                         ha='center', va='baseline',
+                         fontsize=10, color='black',
+                         xytext=(0, 5),
+                         textcoords='offset points')
     plt.tight_layout()
     plt.savefig('Client: Bar chart of the ad spend by client.png', dpi=300, bbox_inches='tight')
     plt.show()
