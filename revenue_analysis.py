@@ -5,25 +5,43 @@ import matplotlib.pyplot as plt
 
 def get_revenue_temporal_scope(csv_file):
     """
+    Reads a revenue data CSV file and returns a dictionary containing information about the temporal scope of the data.
+
+    Args:
+        csv_file (str): The file path of the revenue data CSV file.
+
     Returns:
-        dict: A dictionary containing information about the temporal scope of the revenue data.
+        dict: A dictionary containing the following keys:
+            - filename (str): The file path of the revenue data CSV file.
+            - first_date (datetime): The earliest date in the revenue data.
+            - last_date (datetime): The latest date in the revenue data.
+            - temporal_scope (int): The number of days between the earliest and latest dates, inclusive.
     """
     df = pd.read_csv(csv_file)
     date_col = [col for col in df.columns if 'date' in col.lower()][0]
     first_date = pd.to_datetime(df[date_col]).min()
     last_date = pd.to_datetime(df[date_col]).max()
     temporal_scope = (last_date - first_date).days + 1
-    temporal_scope_results = {'filename': csv_file, 'first_date': first_date, 'last_date': last_date,
-                              'temporal_scope': temporal_scope}
-    print(f"File Path: {temporal_scope_results['filename']}")
-    print(f"First Date: {temporal_scope_results['first_date']}")
-    print(f"Last Date: {temporal_scope_results['last_date']}")
-    print(f"Temporal Scope: {temporal_scope_results['temporal_scope']} days")
+    temporal_scope_info = {'filename': csv_file, 'first_date': first_date, 'last_date': last_date,
+                           'temporal_scope': temporal_scope}
+    print(f"File Path: {temporal_scope_info['filename']}")
+    print(f"First Date: {temporal_scope_info['first_date']}")
+    print(f"Last Date: {temporal_scope_info['last_date']}")
+    print(f"Temporal Scope: {temporal_scope_info['temporal_scope']} days")
     print("______________________")
-    return temporal_scope_results
+    return temporal_scope_info
 
 
 def read_and_explore(file_path):
+    """
+    Reads a revenue CSV file and explores its contents.
+
+    Args:
+        file_path (str): The path to the CSV file.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the revenue data.
+    """
     revenue = pd.read_csv(file_path)
     print("Explore revenue DF:", revenue, "Shape: ", revenue.shape)
     print("______________________")
@@ -31,6 +49,15 @@ def read_and_explore(file_path):
 
 
 def unique_install_id_count(revenue):
+    """
+    Count the number of unique install IDs in the revenue dataframe.
+
+    Args:
+        revenue (pandas.DataFrame): The revenue dataframe.
+
+    Returns:
+        int: The number of unique install IDs.
+    """
     count = revenue['install_id'].nunique()
     print(f"The number of unique install_id: {count}")
     print("______________________")
@@ -38,18 +65,45 @@ def unique_install_id_count(revenue):
 
 
 def preprocess_data(revenue):
+    """
+    Preprocesses the revenue dataframe by converting the 'event_date' column to datetime format.
+
+    Args:
+        revenue (pandas.DataFrame): The revenue data as a Pandas DataFrame.
+
+    Returns:
+        pandas.DataFrame: The preprocessed revenue data as a Pandas DataFrame.
+    """
     revenue['event_date'] = pd.to_datetime(revenue['event_date'])
     return revenue
 
 
 def total_revenue(revenue):
+    """
+    Computes the total revenue in USD from the given revenue data.
+
+    Args:
+        revenue (pd.DataFrame): A pandas DataFrame containing the revenue data.
+
+    Returns:
+        float: The total revenue in USD.
+    """
     total = revenue['value_usd'].sum()
     print(f"Total Revenue (USD):\n{total:.2f}")
     print("______________________")
     return total
 
 
-def revenue_summary(revenue):
+def revenue_central_tendency(revenue):
+    """
+    Computes and returns summary statistics of the revenue data.
+
+    Args:
+        revenue (pandas.DataFrame): A pandas DataFrame containing revenue data.
+
+    Returns:
+        pandas.Series: A pandas Series object containing summary statistics of the revenue data.
+    """
     summary = revenue['value_usd'].describe()
     print("Revenue central tendency:\n", summary)
     print("______________________")
@@ -57,6 +111,15 @@ def revenue_summary(revenue):
 
 
 def revenue_by_date(revenue):
+    """
+    Computes the total revenue by date.
+
+    Args:
+        revenue (pd.DataFrame): A pandas DataFrame containing revenue data.
+
+    Returns:
+        pd.Series: A pandas Series containing the total revenue for each unique date in the `event_date` column.
+    """
     by_date = revenue.groupby('event_date')['value_usd'].sum()
     print("Revenue by Date:\n", by_date, "Shape: ", by_date.shape)
     print("______________________")
@@ -64,6 +127,15 @@ def revenue_by_date(revenue):
 
 
 def revenue_by_install_id(revenue):
+    """
+    Calculates the total revenue for each unique install_id in the revenue DataFrame.
+
+    Args:
+        revenue (pd.DataFrame): A DataFrame containing the revenue data.
+
+    Returns:
+        pd.Series: A Series with the total revenue for each unique install_id, sorted in descending order.
+    """
     by_install_id = revenue.groupby('install_id')['value_usd'].sum().sort_values(ascending=False)
     pd.options.display.float_format = '{:.6f}'.format
     print("Revenue by install_id:\n", by_install_id, "Shape: ", by_install_id.shape)
@@ -72,6 +144,15 @@ def revenue_by_install_id(revenue):
 
 
 def cumulative_revenue(revenue_by_install_id):
+    """
+    Calculates the cumulative revenue generated by each install_id.
+
+    Args:
+        revenue_by_install_id (pandas.Series): A pandas Series containing revenue generated by each install_id.
+
+    Returns:
+        pandas.Series: A pandas Series containing the cumulative revenue generated by each install_id.
+    """
     cum_revenue = revenue_by_install_id.cumsum()
     print("cumulative_revenue:", cum_revenue)
     print("______________________")
@@ -79,6 +160,15 @@ def cumulative_revenue(revenue_by_install_id):
 
 
 def top_1_percent(cumulative_revenue):
+    """
+    Calculates the top 1% of revenue by install_id.
+
+    Args:
+        cumulative_revenue (pandas.Series): Cumulative revenue by install_id.
+
+    Returns:
+        pandas.Series: A series containing the top 1% of revenue by install_id.
+    """
     top_1 = cumulative_revenue[cumulative_revenue >= cumulative_revenue.quantile(0.99)]
     print("top_1_percent", top_1)
     print("______________________")
@@ -86,18 +176,40 @@ def top_1_percent(cumulative_revenue):
 
 
 def decile_revenues(revenue_by_install_id, total_revenue):
+    """
+    Computes the revenue for each decile of install_ids.
+
+    Args:
+        revenue_by_install_id (pandas.Series): The total revenue for each install_id.
+        total_revenue (float): The total revenue for all install_ids.
+
+    Returns:
+        list: A list of the revenue for each decile of install_ids.
+    """
+    # Define the decile thresholds
     decile_thresholds = np.linspace(0, 1, 11)
+
+    # Compute the revenue for each decile
     decile_revs = []
     for i in range(len(decile_thresholds) - 1):
         lower = int(decile_thresholds[i] * len(revenue_by_install_id))
         upper = int(decile_thresholds[i + 1] * len(revenue_by_install_id))
         decile_revenue = revenue_by_install_id.iloc[lower:upper].sum()
         decile_revs.append(decile_revenue)
+
+    # Print the decile revenues and return the list of decile revenues
     print_decile_revenues(decile_revs, total_revenue)
     return decile_revs
 
 
 def print_decile_revenues(decile_revenues, total_revenue):
+    """
+    Prints the revenue percentage for each decile.
+
+    Args:
+        decile_revenues (list): List of revenue for each decile.
+        total_revenue (float): Total revenue for the dataset.
+    """
     for i, decile_revenue in enumerate(decile_revenues):
         decile_percentage = (decile_revenue / total_revenue) * 100
         print(f"Decile {i + 1}: {decile_revenue:.2f} USD ({decile_percentage:.2f}%)")
@@ -105,6 +217,15 @@ def print_decile_revenues(decile_revenues, total_revenue):
 
 
 def duplicate_install_ids(revenue):
+    """
+    Finds and returns the duplicate install IDs in the revenue dataframe.
+
+    Args:
+        revenue (pandas.DataFrame): The revenue dataframe.
+
+    Returns:
+        pandas.DataFrame: A dataframe containing the duplicate install IDs.
+    """
     duplicates = revenue[revenue['install_id'].duplicated()]
     print("Duplicate install_ids:\n", duplicates, "Shape: ", duplicates.shape)
     print("______________________")
@@ -112,6 +233,16 @@ def duplicate_install_ids(revenue):
 
 
 def install_id_counts(revenue):
+    """
+    Returns the count of occurrences of each unique install_id in the revenue DataFrame, and prints the install_id with
+    the highest and lowest count of occurrences.
+
+    Args:
+        revenue (pandas.DataFrame): The revenue data to be analyzed.
+
+    Returns:
+        pandas.Series: A series with the count of occurrences of each unique install_id.
+    """
     id_counts = revenue['install_id'].value_counts()
     most_repeated_install_id = id_counts.idxmax()
     least_repeated_install_id = id_counts.idxmin()
@@ -123,7 +254,17 @@ def install_id_counts(revenue):
     return id_counts
 
 
+
 def plot_revenue_over_time(revenue_by_date):
+    """
+    Plots the revenue distribution over time using a line graph with a 30-day moving average.
+
+    Args:
+        revenue_by_date (pd.Series): A pandas series with the revenue summed by date.
+
+    Returns:
+        None
+    """
     rolling_revenue = revenue_by_date.rolling(window=30).mean()
     plt.figure(figsize=(12, 6))
     revenue_by_date.plot(kind="line")
@@ -138,6 +279,15 @@ def plot_revenue_over_time(revenue_by_date):
 
 
 def plot_decile_revenue_usd(decile_revenues):
+    """
+    Plots the install_id revenue contribution by decile in USD.
+
+    Args:
+        decile_revenues (list): A list of revenue values for each decile.
+
+    Returns:
+        None
+    """
     deciles = [f'Decile {i + 1}' for i in range(len(decile_revenues))]
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(deciles, decile_revenues)
@@ -151,6 +301,16 @@ def plot_decile_revenue_usd(decile_revenues):
 
 
 def plot_decile_revenue_of_total_percentage(decile_revenues, total_revenue):
+    """
+    Plots the revenue contribution by decile as a percentage of the total revenue.
+
+    Args:
+        decile_revenues (list): A list of decile revenues.
+        total_revenue (float): The total revenue.
+
+    Returns:
+        None
+    """
     deciles = [f'Decile {i + 1}' for i in range(len(decile_revenues))]
     decile_percentages = [(decile_revenue / total_revenue) * 100 for decile_revenue in decile_revenues]
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -165,6 +325,15 @@ def plot_decile_revenue_of_total_percentage(decile_revenues, total_revenue):
 
 
 def pareto_distribution(cumulative_percentage):
+    """
+    Plots the Pareto distribution of total revenue by install_id.
+
+    Args:
+        cumulative_percentage (array-like): The cumulative percentage of total revenue contributed by each install_id.
+
+    Returns:
+        None: The function only plots the graph.
+    """
     percentiles = np.linspace(0, 100, len(cumulative_percentage))
     selected_percentiles = np.arange(0, 101, 5)
     selected_cumulative_percentage = np.interp(selected_percentiles, percentiles, cumulative_percentage)
@@ -181,6 +350,16 @@ def pareto_distribution(cumulative_percentage):
 
 
 def top_10_percent_decile_revenues(revenue_by_install_id, total_revenue):
+    """
+    Computes the revenue contribution of the top 10% install_ids divided into deciles.
+
+    Args:
+        revenue_by_install_id (pd.Series): A pandas series containing revenue grouped by install_id.
+        total_revenue (float): The total revenue in USD.
+
+    Returns:
+        list: A list containing the revenue contribution of the top 10% install_ids divided into deciles.
+    """
     top_10_percent_install_ids = revenue_by_install_id.head(int(len(revenue_by_install_id) * 0.1))
     top_10_percent_revenue = top_10_percent_install_ids.sum()
     top_10_percent_decile_revenues = []
@@ -193,6 +372,16 @@ def top_10_percent_decile_revenues(revenue_by_install_id, total_revenue):
 
 
 def plot_top_10_percent_decile_percentages(top_10_percent_decile_revenues, total_revenue):
+    """
+    Plots the percentage of total revenue contributed by each decile for the top 10% of install_ids by revenue.
+
+    Args:
+        top_10_percent_decile_revenues (list): A list of revenues for each decile of the top 10% install_ids.
+        total_revenue (float): The total revenue of the dataset.
+
+    Returns:
+        None
+    """
     top_10_percent_decile_percentages = [(decile_revenue / total_revenue) * 100 for decile_revenue in
                                          top_10_percent_decile_revenues]
     deciles = [f'Decile {i + 1}' for i in range(len(top_10_percent_decile_percentages))]
@@ -208,6 +397,15 @@ def plot_top_10_percent_decile_percentages(top_10_percent_decile_revenues, total
 
 
 def plot_top_10_percent_decile_revenues(top_10_percent_decile_revenues):
+    """
+    Plots the revenue contribution by decile for the top 10% of install_ids in USD.
+
+    Args:
+    top_10_percent_decile_revenues (list): A list of revenue values for each decile.
+
+    Returns:
+    None
+    """
     deciles = [f'Decile {i + 1}' for i in range(len(top_10_percent_decile_revenues))]
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(deciles, top_10_percent_decile_revenues)
@@ -220,68 +418,73 @@ def plot_top_10_percent_decile_revenues(top_10_percent_decile_revenues):
     plt.show()
 
 
-revenue_path = '/Users/khaled/Downloads/data/revenue_converted.csv'
-# analyze_revenue(file_path)
+def main():
+    # Set the path to the revenue data file
+    revenue_path = '/Users/khaled/Downloads/data/revenue_converted.csv'
 
-# gGet_revenue_temporal_scope
-temporal_scope_results = get_revenue_temporal_scope(revenue_path)
+    # Get and print the temporal scope of the revenue data
+    get_revenue_temporal_scope(revenue_path)
 
-# Read and explore the data
-revenue = read_and_explore(revenue_path)
+    # Read the revenue data and print basic information
+    revenue = read_and_explore(revenue_path)
 
-# Get the unique install_id count
-unique_count = unique_install_id_count(revenue)
+    # Count and print the number of unique install_ids in the data
+    unique_install_id_count(revenue)
 
-# Preprocess the data
-revenue = preprocess_data(revenue)
+    # Preprocess the revenue data (e.g., convert date strings to datetime objects)
+    revenue = preprocess_data(revenue)
 
-# Calculate the total revenue
-total_rev = total_revenue(revenue)
+    # Calculate and print the total revenue
+    total_rev = total_revenue(revenue)
 
-# Get the revenue summary
-summary = revenue_summary(revenue)
+    # Calculate and print central tendency measures for the revenue data
+    revenue_central_tendency(revenue)
 
-# Calculate revenue by date
-rev_by_date = revenue_by_date(revenue)
+    # Calculate and print the revenue per date
+    rev_by_date = revenue_by_date(revenue)
 
-# Calculate revenue by install_id
-rev_by_install_id = revenue_by_install_id(revenue)
+    # Calculate and print the revenue per install_id
+    rev_by_install_id = revenue_by_install_id(revenue)
 
-# Calculate cumulative revenue
-cum_revenue = cumulative_revenue(rev_by_install_id)
+    # Calculate and print the cumulative revenue per install_id
+    cum_revenue = cumulative_revenue(rev_by_install_id)
 
-# Calculate cumulative percentage
-cumulative_percentage = (cum_revenue / total_rev) * 100
+    # Calculate and store the cumulative percentage of revenue per install_id
+    cumulative_percentage = (cum_revenue / total_rev) * 100
 
-# Calculate the top 1 percent
-top1 = top_1_percent(cum_revenue)
+    # Find and print the top 1% of install_ids based on revenue
+    top1 = top_1_percent(cum_revenue)
 
-# Calculate decile revenues
-decile_revenue = decile_revenues(rev_by_install_id, total_rev)
+    # Calculate and print the revenue for each decile of install_ids
+    decile_revenue = decile_revenues(rev_by_install_id, total_rev)
 
-# Find duplicate install_ids
-duplicates = duplicate_install_ids(revenue)
+    # Find and print any duplicate install_ids
+    duplicate_install_ids(revenue)
 
-# Calculate install_id counts
-id_counts = install_id_counts(revenue)
+    # Calculate and print the number of occurrences for each install_id
+    install_id_counts(revenue)
 
-# Plot revenue over time
-plot_revenue_over_time(rev_by_date)
+    # Plot and save the revenue distribution over time
+    plot_revenue_over_time(rev_by_date)
 
-# Plot decile revenue as USD
-plot_decile_revenue_usd(decile_revenue)
+    # Plot and save the decile revenue in USD
+    plot_decile_revenue_usd(decile_revenue)
 
-# Plot decile revenue as percentage
-plot_decile_revenue_of_total_percentage(decile_revenue, total_rev)
+    # Plot and save the decile revenue as a percentage of total revenue
+    plot_decile_revenue_of_total_percentage(decile_revenue, total_rev)
 
-# Plot the Pareto distribution
-pareto_distribution(cumulative_percentage)
+    # Plot and save the Pareto distribution of revenue by install_id
+    pareto_distribution(cumulative_percentage)
 
-# Calculate the top 10% decile revenues
-top_10_decile_revenues = top_10_percent_decile_revenues(rev_by_install_id, total_rev)
+    # Calculate and store the revenue for each decile within the top 10% of install_ids
+    top_10_decile_revenues = top_10_percent_decile_revenues(rev_by_install_id, total_rev)
 
-# Plot the top 10% decile percentages
-plot_top_10_percent_decile_percentages(top_10_decile_revenues, total_rev)
+    # Plot and save the top 10% decile percentages
+    plot_top_10_percent_decile_percentages(top_10_decile_revenues, total_rev)
 
-# Plot the top 10% decile revenues in USD
-plot_top_10_percent_decile_revenues(top_10_decile_revenues)
+    # Plot and save the top 10% decile revenues in USD
+    plot_top_10_percent_decile_revenues(top_10_decile_revenues)
+
+
+if __name__ == '__main__':
+    main()
