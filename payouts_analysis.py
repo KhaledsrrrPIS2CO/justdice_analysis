@@ -267,7 +267,7 @@ def pareto_distribution(dataframe):
     return payouts_by_id[["install_id", "value_usd", "cumulative_percentage"]]
 
 
-def main(payouts_file_path):
+def payouts_main(payouts_file_path):
     payouts_df = load_data(payouts_file_path)
 
     start_date, end_date = get_temporal_scope(payouts_df, "event_date")
@@ -304,6 +304,5 @@ def main(payouts_file_path):
 
 
 if __name__ == "__main__":
-    payouts_file_path = "/Users/khaled/Downloads/data/payouts_converted.csv"
-    installs_file_path = "/Users/khaled/Downloads/data/installs.csv"
-    main(payouts_file_path)
+    payouts_file_path = "data/payouts_converted.csv"
+    payouts_main(payouts_file_path)

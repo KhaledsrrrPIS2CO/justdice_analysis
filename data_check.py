@@ -28,19 +28,6 @@ def convert_scientific_notation(file_path):
     return new_file_path
 
 
-print("Adspend: ")
-convert_scientific_notation('/Users/khaled/Downloads/data/adspend.csv')
-print("Installs:")
-convert_scientific_notation('/Users/khaled/Downloads/data/installs.csv')
-print("Payouts:")
-convert_scientific_notation('/Users/khaled/Downloads/data/payouts.csv')
-print("Revenue:")
-convert_scientific_notation('/Users/khaled/Downloads/data/revenue.csv')
-
-print("Files are being exported...\n")
-time.sleep(10)  # wait for 10 seconds for csv files to be exported
-
-
 def check_data_types(file_path):
     """
     To make sure the data is clean,   this function takes the path of a CSV file as input, reads the file, and analyzes
@@ -93,36 +80,6 @@ def check_data_types(file_path):
     return data_types_count
 
 
-if __name__ == '__main__':
-    adspend_path = f"/Users/khaled/Downloads/data/adspend_converted.csv"
-    installs_path = f"/Users/khaled/Downloads/data/installs.csv"
-    payouts_path = f"/Users/khaled/Downloads/data/payouts_converted.csv"
-    revenue_path = f"/Users/khaled/Downloads/data/revenue_converted.csv"
-
-    # Call the function with the file paths and print the resulting dictionary
-    print("Adspend:: ")
-    data_types_count_adspend = check_data_types(adspend_path)
-    for column, count in data_types_count_adspend.items():
-        print(f"{column}, {count}")
-
-    print("\nInstalls: ")
-    data_types_count_installs = check_data_types(installs_path)
-    for column, count in data_types_count_installs.items():
-        print(f"{column}, {count}")
-
-    print("\nPayouts: ")
-    data_types_count_payouts = check_data_types(payouts_path)
-    for column, count in data_types_count_payouts.items():
-        print(f"{column}, {count}")
-
-    print("\nRevenue: ")
-    data_types_count_revenue = check_data_types(revenue_path)
-    for column, count in data_types_count_revenue.items():
-        print(f"{column}, {count}")
-
-print("\n-----------------\n")
-
-
 def explore_csv(file_path):
     """
     Description:
@@ -160,18 +117,64 @@ def explore_csv(file_path):
     print(df.isnull().sum())
 
 
-print("______________________")
-print("Explore Adspend:")
-explore_csv('/Users/khaled/Downloads/data/adspend_converted.csv')
-print("______________________")
-print("Explore Installs:")
-explore_csv('/Users/khaled/Downloads/data/installs.csv')
-print("______________________")
-print("Explore Payouts:")
-explore_csv('/Users/khaled/Downloads/data/payouts_converted.csv')
-print("______________________")
-print("Explore Revenue:")
-explore_csv('/Users/khaled/Downloads/data/revenue_converted.csv')
-print("______________________")
+def data_check_main():
+    # Call convert_scientific_notation
+    print("Adspend: ")
+    convert_scientific_notation('data/adspend.csv')
+    print("Installs:")
+    convert_scientific_notation('data/installs.csv')
+    print("Payouts:")
+    convert_scientific_notation('data/payouts.csv')
+    print("Revenue:")
+    convert_scientific_notation('data/revenue.csv')
 
-print("Done, files are ready for analysis.")
+    print("Files are being exported...\n")
+    time.sleep(10)  # wait for 10 seconds for csv files to be exported
+
+    # Clean data paths
+    adspend_path = "data/adspend_converted.csv"
+    installs_path = "data/installs.csv"
+    payouts_path = "data/payouts_converted.csv"
+    revenue_path = "data/revenue_converted.csv"
+
+    # Call the function with the file paths and print the resulting dictionaries
+    print("Adspend: ")
+    data_types_count_adspend = check_data_types(adspend_path)
+    for column, count in data_types_count_adspend.items():
+        print(f"{column}, {count}")
+
+    print("\nInstalls: ")
+    data_types_count_installs = check_data_types(installs_path)
+    for column, count in data_types_count_installs.items():
+        print(f"{column}, {count}")
+
+    print("\nPayouts: ")
+    data_types_count_payouts = check_data_types(payouts_path)
+    for column, count in data_types_count_payouts.items():
+        print(f"{column}, {count}")
+
+    print("\nRevenue: ")
+    data_types_count_revenue = check_data_types(revenue_path)
+    for column, count in data_types_count_revenue.items():
+        print(f"{column}, {count}")
+
+    # Call explore_csv to explore data
+    print("______________________")
+    print("Explore Adspend:")
+    explore_csv('data/adspend_converted.csv')
+    print("______________________")
+    print("Explore Installs:")
+    explore_csv('data/installs.csv')
+    print("______________________")
+    print("Explore Payouts:")
+    explore_csv('data/payouts_converted.csv')
+    print("______________________")
+    print("Explore Revenue:")
+    explore_csv('data/revenue_converted.csv')
+    print("______________________")
+
+    print("Done, files are ready for analysis.")
+
+
+if __name__ == "__main__":
+    data_check_main()

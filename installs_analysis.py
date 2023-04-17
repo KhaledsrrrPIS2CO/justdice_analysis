@@ -295,7 +295,7 @@ def pareto_distribution_install_id_by_os(dataframe):
     plt.show()
 
 
-def main(file_path):
+def installs_main(file_path):
     installs_df = load_data(file_path)
 
 
@@ -329,5 +329,5 @@ def main(file_path):
 
 
 if __name__ == "__main__":
-    installs_file_path = "/Users/khaled/Downloads/data/installs.csv"
-    main(installs_file_path)
+    installs_file_path = "data/installs.csv"
+    installs_main(installs_file_path)

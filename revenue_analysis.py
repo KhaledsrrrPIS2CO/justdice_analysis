@@ -254,7 +254,6 @@ def install_id_counts(revenue):
     return id_counts
 
 
-
 def plot_revenue_over_time(revenue_by_date):
     """
     Plots the revenue distribution over time using a line graph with a 30-day moving average.
@@ -418,9 +417,9 @@ def plot_top_10_percent_decile_revenues(top_10_percent_decile_revenues):
     plt.show()
 
 
-def main():
+def revenue_main():
     # Set the path to the revenue data file
-    revenue_path = '/Users/khaled/Downloads/data/revenue_converted.csv'
+    revenue_path = "data/revenue_converted.csv"
 
     # Get and print the temporal scope of the revenue data
     get_revenue_temporal_scope(revenue_path)
@@ -487,4 +486,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    revenue_main()

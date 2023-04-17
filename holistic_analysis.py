@@ -56,6 +56,7 @@ def calculate_average_payout_per_user(installs_csv, payouts_csv):
 
     return appu
 
+
 # this is nonsense  I got the formula form Hubspot
 # def calculate_marketing_roi(adspend_csv, installs_csv, revenue_csv, conversion_pct):
 #     adspend = pd.read_csv(adspend_csv)
@@ -182,24 +183,34 @@ def plot_time_series(installs_path, revenue_path, adspend_path, payouts_path):
     plt.show()
 
 
-def main():
+def calculate_risk_to_reward(user_acquisition_cost, average_revenue_per_user, average_payout_per_user):
+    # Calculate Install ID cost
+    install_id_cost = average_payout_per_user + user_acquisition_cost
+
+    # Calculate Risk-to-Reward ratio
+    risk_to_reward = average_revenue_per_user / install_id_cost
+
+    return risk_to_reward
+
+
+def holistic_main():
     # Set the paths to the CSV files
-    installs_path = '/Users/khaled/Downloads/data/installs.csv'
-    revenue_path = '/Users/khaled/Downloads/data/revenue_converted.csv'
-    adspend_path = '/Users/khaled/Downloads/data/adspend_converted.csv'
-    payouts_path = "/Users/khaled/Downloads/data/payouts_converted.csv"
+    installs_path = "data/installs.csv"
+    revenue_path = "data/revenue_converted.csv"
+    adspend_path = "data/adspend_converted.csv"
+    payouts_path = "data/payouts_converted.csv"
+
+    # Calculate the ARPU
+    average_revenue_per_user = calculate_average_revenue_per_user(installs_path, revenue_path)
+    print('Average Revenue per User (ARPU): $', round(average_revenue_per_user, 2))
 
     # Calculate the UAC
     user_acquisition_cost = calculate_user_acquisition_cost(adspend_path, installs_path)
     print('User Acquisition Cost (UAC/CPL): $', round(user_acquisition_cost, 2))
 
-    # Calculate the ARPU
-    average_revenue_per_user = calculate_average_revenue_per_user(installs_path, revenue_path)
-    print('Average Revenue per User (ARPU):', round(average_revenue_per_user, 2))
-
     # Calculate the APPU
     average_payout_per_user = calculate_average_payout_per_user(installs_path, payouts_path)
-    print('Average Payout per User (APPU):', round(average_payout_per_user, 2))
+    print('Average Payout per User (APPU): $', round(average_payout_per_user, 2))
 
     conversion_rate_pct = conversion_rate(installs_path, revenue_path)
     print(f"Conversion Rate: {round(conversion_rate_pct, 2)}%")
@@ -208,8 +219,6 @@ def main():
     # roi = calculate_marketing_roi(adspend_path, installs_path, revenue_path, conversion_rate_pct)
     # print(f"Marketing ROI: {roi:.2f}%")
 
-
-
     # Calculate the profit margin
     profit_margin = calculate_gross_profit_margin(revenue_path, adspend_path, payouts_path)
     print('Gross Profit Margin:', round(profit_margin, 2) * 100, "%")
@@ -217,6 +226,9 @@ def main():
     # Plot plot_time_series
     plot_time_series(installs_path, revenue_path, adspend_path, payouts_path)
 
+    risk_to_reward = calculate_risk_to_reward(user_acquisition_cost, average_revenue_per_user, average_payout_per_user)
+    print(f"Risk-to-Reward ratio: {risk_to_reward:.2f}:1")
+
 
 if __name__ == '__main__':
-    main()
+    holistic_main()

@@ -229,7 +229,7 @@ def plot_adspend_percentage_pareto(adspend_by_client):
     plt.show()
 
 
-def analyze_adspend(file_path):
+def adspend_main(file_path):
     get_adspend_temporal_scope(adspend_path)
     adspend = read_and_preprocess_data(file_path)
     adspend_by_country, adspend_by_network, adspend_by_client, adspend_by_date = analyze_adspend_data(adspend)
@@ -245,5 +245,5 @@ def analyze_adspend(file_path):
 
 
 # Call the analyze_adspend function with the file_path
-adspend_path = '/Users/khaled/Downloads/data/adspend_converted.csv'
-analyze_adspend(adspend_path)
+adspend_path = "data/adspend_converted.csv"
+adspend_main(adspend_path)
