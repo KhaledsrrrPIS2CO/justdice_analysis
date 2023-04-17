@@ -6,9 +6,52 @@ import numpy as np
 from scipy.stats import pareto
 
 
+def get_adspend_temporal_scope(csv_file):
+    """
+    Returns:
+        dict: A dictionary containing information about the temporal scope of the Adspend data.
+    """
+    df = pd.read_csv(csv_file)
+    date_col = [col for col in df.columns if 'date' in col.lower()][0]
+    first_date = pd.to_datetime(df[date_col]).min()
+    last_date = pd.to_datetime(df[date_col]).max()
+    temporal_scope = (last_date - first_date).days + 1
+    temporal_scope_info = {'filename': csv_file, 'first_date': first_date, 'last_date': last_date,
+                           'temporal_scope': temporal_scope}
+    print(f"File Path: {temporal_scope_info['filename']}")
+    print(f"First Date: {temporal_scope_info['first_date']}")
+    print(f"Last Date: {temporal_scope_info['last_date']}")
+    print(f"Temporal Scope: {temporal_scope_info['temporal_scope']} days")
+    print(f"Temporal Scope: {temporal_scope_info['temporal_scope']} days")
+    print("______________________")
+    return temporal_scope_info
+
+
+def plot_adspend_by_country(adspend_by_country, total_adspend):
+    # Calculate the cumulative percentage of total ad spend by country
+    sorted_adspend = adspend_by_country.sort_values(ascending=False).reset_index(drop=True)
+    cumulative_percentage = sorted_adspend.cumsum() / total_adspend * 100
+
+    # Plot the Pareto distribution
+    percentiles = np.linspace(0, 100, len(sorted_adspend) + 1)
+    selected_percentiles = np.arange(0, 101, 5)
+    selected_cumulative_percentage = np.interp(selected_percentiles, percentiles,
+                                               np.insert(cumulative_percentage.values, 0, 0))
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.plot(selected_percentiles, selected_cumulative_percentage, marker='o')
+    ax.set_xlabel('Percentile of Country')
+    ax.set_ylabel('Cumulative Percentage of Total Ad Spend')
+    ax.set_title('Pareto Distribution of Ad Spend by Country')
+    ax.set_xticks(np.arange(0, 101, 10))
+    ax.set_yticks(np.arange(0, 101, 10))
+    plt.grid()
+    plt.tight_layout()
+    plt.savefig('Country_Ad_Spend_Pareto_Distribution.png', dpi=300, bbox_inches='tight')
+    plt.show()
+
+
 def read_and_preprocess_data(file_path):
     # Read and preprocess data
-
     adspend = pd.read_csv(file_path)
     adspend['event_date'] = pd.to_datetime(adspend['event_date'])
     return adspend
@@ -139,25 +182,26 @@ def plot_adspend_by_client(adspend_by_client, total_adspend):
     plt.show()
 
 
-def plot_pareto_distribution(adspend_by_client):
-    # Histogram of ad spend by client
-    plt.figure(figsize=(12, 6))
-    n, bins, patches = plt.hist(adspend_by_client, bins=50, alpha=0.6, color='b', label='Ad Spend Histogram by Client')
-    plt.title("Ad Spend Histogram by Client")
-    plt.xlabel("Ad Spend (USD)")
-    plt.ylabel("Frequency")
+def plot_pareto_distribution_adspend_by_client(adspend_by_client):
+    # Calculate the cumulative percentage of total ad spend
+    sorted_adspend = adspend_by_client.sort_values(ascending=False).reset_index(drop=True)
+    cumulative_percentage = sorted_adspend.cumsum() / sorted_adspend.sum() * 100
+
+    # Plot the Pareto distribution
+    percentiles = np.linspace(0, 100, len(sorted_adspend) + 1)
+    selected_percentiles = np.arange(0, 101, 5)
+    selected_cumulative_percentage = np.interp(selected_percentiles, percentiles,
+                                               np.insert(cumulative_percentage.values, 0, 0))
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.plot(selected_percentiles, selected_cumulative_percentage, marker='o')
+    ax.set_xlabel('Percentile of Client')
+    ax.set_ylabel('Cumulative Percentage of Total Ad Spend')
+    ax.set_title('Pareto Distribution of Ad Spend by Client')
+    ax.set_xticks(np.arange(0, 101, 10))
+    ax.set_yticks(np.arange(0, 101, 10))
+    plt.grid()
     plt.tight_layout()
-    plt.ylim((0, 50))  # set the y-axis limits to (0, 50)
-    plt.xticks(np.arange(0, adspend_by_client.max() + 10000, 10000), rotation=45)
-    # Fit a Pareto distribution to the ad spend data
-    data = adspend_by_client.values
-    b, loc, scale = pareto.fit(data)
-    # Plot the fitted Pareto distribution
-    x = np.linspace(min(data), max(data), 100)
-    y = pareto.pdf(x, b, loc=loc, scale=scale) * n.sum() * (bins[1] - bins[0])
-    plt.plot(x, y, label='Fitted Pareto', linestyle='--', color='r')
-    plt.legend()
-    plt.savefig('Client: Ad Spend Histogram and Power Law Distribution.png', dpi=300, bbox_inches='tight')
+    plt.savefig('Client_Ad_Spend_Pareto_Distribution.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -186,6 +230,7 @@ def plot_adspend_percentage_pareto(adspend_by_client):
 
 
 def analyze_adspend(file_path):
+    get_adspend_temporal_scope(adspend_path)
     adspend = read_and_preprocess_data(file_path)
     adspend_by_country, adspend_by_network, adspend_by_client, adspend_by_date = analyze_adspend_data(adspend)
     print_preview_data(adspend, adspend_by_country, adspend_by_network, adspend_by_client, adspend_by_date)
@@ -194,9 +239,9 @@ def analyze_adspend(file_path):
     plot_adspend_over_time(adspend_by_date)
     plot_adspend_by_network(adspend_by_network, total_adspend)
     plot_adspend_by_client(adspend_by_client, total_adspend)
-    plot_pareto_distribution(adspend_by_client)
     plot_adspend_by_country_log(adspend_by_country, total_adspend)
     plot_adspend_percentage_pareto(adspend_by_client)
+    plot_pareto_distribution_adspend_by_client(adspend_by_client)
 
 
 # Call the analyze_adspend function with the file_path

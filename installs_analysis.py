@@ -22,6 +22,12 @@ def count_install_ids(dataframe, column):
     return unique_install_ids, total_install_ids
 
 
+def find_duplicate_install_ids(dataframe, column):
+    duplicate_install_ids = dataframe[dataframe.duplicated(subset=column, keep=False)].sort_values(by=column)
+    print("Duplicate Install IDs:\n", duplicate_install_ids[column].values)
+    return duplicate_install_ids
+
+
 def read_and_explore(dataframe):
     installs_explore = dataframe
     print("\nExplore installs DF:", installs_explore, "\n")
@@ -66,6 +72,7 @@ def plot_installs_over_time_and_moving_average(dataframe, date_column, window=30
 
     # Show the plot
     plt.tight_layout()
+    plt.savefig('installs plot_installs_over_time_and_moving_average.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -291,11 +298,14 @@ def pareto_distribution_install_id_by_os(dataframe):
 def main(file_path):
     installs_df = load_data(file_path)
 
+
     get_temporal_scope(installs_df, "event_date")
 
     read_and_explore(installs_df)
 
     count_install_ids(installs_df, "install_id")
+
+    find_duplicate_install_ids(installs_df, "install_id")
 
     count_unique_values(installs_df)
 

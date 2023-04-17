@@ -33,10 +33,6 @@ def calculate_daily_payouts(payouts):
     return payouts.groupby("event_date")["value_usd"].sum().reset_index()
 
 
-def merge_installs_and_payouts(installs, payouts):
-    return pd.merge(installs, payouts, on="install_id", how="inner")
-
-
 def calculate_average_payouts_per_group(merged_data, group_column):
     return merged_data.groupby(group_column)["value_usd"].mean().reset_index()
 
@@ -161,8 +157,6 @@ def calculate_plot_payouts_by_decile_usd(dataframe):
     return decile_payouts[["decile", "value_usd"]]
 
 
-
-
 def plot_and_calculate_biggest_decile_to_ten_deciles_usd(dataframe):
     # Calculate the payouts for each install ID
     payouts_by_id = dataframe.groupby("install_id")["value_usd"].sum().reset_index()
@@ -200,6 +194,7 @@ def plot_and_calculate_biggest_decile_to_ten_deciles_usd(dataframe):
     plt.savefig('Payouts by Decile of top 10 of payouts (USD).png', dpi=300, bbox_inches='tight')
 
     return sub_decile_payouts[["sub_decile", "value_usd"]]
+
 
 def plot_and_calculate_biggest_decile_to_ten_deciles_percent(dataframe):
     total_payouts = dataframe["value_usd"].sum()
@@ -244,9 +239,6 @@ def plot_and_calculate_biggest_decile_to_ten_deciles_percent(dataframe):
     return sub_decile_payouts[["sub_decile", "value_usd", "payout_percentage"]]
 
 
-####
-
-
 def pareto_distribution(dataframe):
     # Calculate the total payouts for each install ID
     payouts_by_id = dataframe.groupby("install_id")["value_usd"].sum().reset_index()
@@ -275,43 +267,43 @@ def pareto_distribution(dataframe):
     return payouts_by_id[["install_id", "value_usd", "cumulative_percentage"]]
 
 
-def main(payouts_file_path, installs_file_path):
-    payouts_path = load_data(payouts_file_path)
+def main(payouts_file_path):
+    payouts_df = load_data(payouts_file_path)
 
-    start_date, end_date = get_temporal_scope(payouts_path, "event_date")
+    start_date, end_date = get_temporal_scope(payouts_df, "event_date")
     print(f"\nTemporal scope of payouts_converted.csv: {start_date} - {end_date}")
 
     total_payouts, average_payout_per_install, max_payout, min_payout = calculate_total_average_max_and_min_payouts(
-        payouts_path)
+        payouts_df)
     print(f"\nTotal Payouts (USD): {total_payouts}\nAverage Payout per Install: {average_payout_per_install}"
           f"\nMaximum Payout: {max_payout}\nMinimum Payout: {min_payout}")
 
     # Read and explore the data
-    read_and_explore(payouts_path)
+    read_and_explore(payouts_df)
 
-    payouts_path = convert_unix_time_to_datetime(payouts_file_path)
+    payouts_df = convert_unix_time_to_datetime(payouts_file_path)
 
-    shape, num_all_install_ids, num_unique_install_ids = get_payouts_info(payouts_path)
+    shape, num_all_install_ids, num_unique_install_ids = get_payouts_info(payouts_df)
     print(f"Shape of Data: {shape}\nNumber of All Install IDs: {num_all_install_ids}"
           f"\nNumber of Unique Install IDs: {num_unique_install_ids}\n")
 
-    unique_install_ids, total_install_ids = count_install_ids(payouts_path, "install_id")
+    unique_install_ids, total_install_ids = count_install_ids(payouts_df, "install_id")
     print(f"\nUnique Install IDs: {unique_install_ids}\nTotal Install IDs: {total_install_ids}")
 
-    mean, median, mode = calculate_central_tendency(payouts_path, "value_usd")
+    mean, median, mode = calculate_central_tendency(payouts_df, "value_usd")
     print(f"Mean: {mean}\nMedian: {median}\nMode: {mode}")
 
-    daily_payouts = calculate_daily_payouts(payouts_path)
+    daily_payouts = calculate_daily_payouts(payouts_df)
     plot_calculate_time_series(daily_payouts, window_size=30)
 
-    calculate_plot_payouts_by_decile_percentage(payouts_path)
-    calculate_plot_payouts_by_decile_usd(payouts_path)
-    plot_and_calculate_biggest_decile_to_ten_deciles_usd(payouts_path)
-    plot_and_calculate_biggest_decile_to_ten_deciles_percent(payouts_path)
-    pareto_distribution(payouts_path)
+    calculate_plot_payouts_by_decile_percentage(payouts_df)
+    calculate_plot_payouts_by_decile_usd(payouts_df)
+    plot_and_calculate_biggest_decile_to_ten_deciles_usd(payouts_df)
+    plot_and_calculate_biggest_decile_to_ten_deciles_percent(payouts_df)
+    pareto_distribution(payouts_df)
 
 
 if __name__ == "__main__":
     payouts_file_path = "/Users/khaled/Downloads/data/payouts_converted.csv"
     installs_file_path = "/Users/khaled/Downloads/data/installs.csv"
-    main(payouts_file_path, installs_file_path)
+    main(payouts_file_path)
