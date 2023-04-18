@@ -26,7 +26,7 @@ def initialize_parameters():
 
 
     """
-    initial_equity = 254075 + 6232
+    initial_equity = 254075 + 62320
     loss_pct = 0.01
     win_pct = 0.0122
     win_rate = 0.3726
@@ -40,10 +40,10 @@ def initialize_parameters():
     sudden_error_lower = 0.01
 
     #  convex parameters
-    sudden_convex_interval_lower = 40
-    sudden_convex_interval_upper = 80
-    convex_payoff_upper = 0.01
-    convex_payoff_lower = 0.01
+    sudden_convex_interval_lower = 80
+    sudden_convex_interval_upper = 160
+    convex_payoff_upper = 0.3
+    convex_payoff_lower = 0.2
 
     print(f"Stats\nrrr: ", win_pct * 100, " to ", loss_pct * 100, "\nwin rate: ", win_rate, "%", "\nTrades num:",
           number_of_trades, "\nPaths/traders num: ", number_of_paths, "\n"f'Sudden error % (random range) from'
@@ -181,9 +181,10 @@ def plot_equity_curves(all_paths_results, min_equity, max_equity, avg_equity, nu
     plt.text(0, max_equity, f'${max_equity:.0f}', fontsize="13")
     plt.text(0, avg_equity, f'${avg_equity:.0f}', fontsize="13")
 
-    plt.title("Monte Carlo Simulation")
+    plt.title("JustDice Monte Carlo Simulation")
     plt.ylabel("$$$")
     plt.xlabel("Num of simulations")
+    plt.savefig('Monte Carlo Simu paths.png', dpi=600, bbox_inches='tight')
     plt.show()
 
 
@@ -195,6 +196,7 @@ def plot_histogram(all_paths_results, number_of_paths):
     plt.xlabel("$$$")
     plt.ylabel("Number of companies/traders")
     plt.title("Histogram of End Results")
+    plt.savefig('Monte Carlo Simu Histogram of End Results.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 
