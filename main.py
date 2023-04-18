@@ -14,6 +14,7 @@ def main():
     """
     This function calls the main analysis functions for each of the following:
     - Ad spend
+    - Monte carlo simulation
     - Data Check
     - Holistic analysis
     - Installs
