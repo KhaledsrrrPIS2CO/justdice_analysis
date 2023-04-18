@@ -7,6 +7,7 @@ from holistic_analysis import holistic_main
 from installs_analysis import installs_main
 from payouts_analysis import payouts_main
 from revenue_analysis import revenue_main
+from monte_carlo_simulation import monte_carlo_main
 
 
 def main():
@@ -29,6 +30,11 @@ def main():
     # Call the main analysis function for holistic analysis
     print("===== Holistic Analysis =====")
     holistic_main()
+    print("\n")
+
+    # Call the main analysis function for revenue
+    print("===== Monte Carlo Simulation =====")
+    monte_carlo_main()
     print("\n")
 
     # Call the main analysis function for ad spend
